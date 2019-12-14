@@ -1,0 +1,12 @@
+image: silkeh/clang
+
+build:
+  stage: build
+  script:
+    - cmake . -B out/gitlab
+    - cmake --build out/gitlab --target all
+    - cd out/giltab
+    - ctest
+  artifacts:
+    paths:
+      - out/gitlab
