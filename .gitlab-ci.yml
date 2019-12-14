@@ -5,8 +5,8 @@ build:
   script:
     - cmake . -B out/gitlab
     - cmake --build out/gitlab --target all
-    - cd out/giltab
+    - cd ./out/gitlab
     - ctest
-    - cd smaep_cli
+    - cd ./smaep_cli
     - ./smaep_cli -a "2 * (3 + 4)"
 
