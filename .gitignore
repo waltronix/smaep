@@ -1,0 +1,11 @@
+# cmake
+CMakeFiles/**
+CMakeCache.txt
+cmake_install.cmake*
+out/**
+
+# IDE stuff
+.vs/**
+.vscode/**
+Testing/**
+

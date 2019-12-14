@@ -7,6 +7,6 @@ build:
     - cmake --build out/gitlab --target all
     - cd out/giltab
     - ctest
-  artifacts:
-    paths:
-      - out/gitlab
+    - cd smaep_cli
+    - ./smaep_cli -a "2 * (3 + 4)"
+
