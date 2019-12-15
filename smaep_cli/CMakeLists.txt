@@ -1,13 +1,15 @@
 cmake_minimum_required(VERSION 3.13)
 project(smaep_cli)
 
+FetchContent_Declare(
+  cli11
+  URL https://github.com/CLIUtils/CLI11/archive/v1.8.0.zip)
+FetchContent_Populate(cli11)
+message(STATUS "cli11 is available in " ${cli11_SOURCE_DIR})
+
 add_executable(smaep_cli ${SOURCE_FILES} "./main.cpp")
-target_link_libraries(smaep_cli PRIVATE smaep)
-
-# if(BUILD_TESTS) file(GLOB TEST_SRC "test/*.cpp")
-
-# add_executable(smaep_test ${SOURCE_FILES} ${TEST_SRC})
-# target_include_directories(smaep_test PRIVATE ${pegtl_SOURCE_DIR}/include
-# ${jsoncons_SOURCE_DIR}/include ${catch_SOURCE_DIR}/single_include ./include )
-
-# add_test(NAME smaep_test COMMAND smaep_test) endif()
+target_include_directories(smaep_cli
+                           PUBLIC 
+                           ${cli11_SOURCE_DIR}/include 
+                           ./include)
+target_link_libraries(smaep_cli PRIVATE smaep json_source stdc++fs)

@@ -2,11 +2,13 @@ image: rikorose/gcc-cmake
 
 build:
   stage: build
+  when: manual
   script:
     - cmake . -B out/gitlab
     - cmake --build out/gitlab --target all
     - cd out/gitlab
     - ctest
     - cd ./smaep_cli
-    - ./smaep_cli -a "2 * (3 + 4)"
-
+    - ./smaep_cli -h
+    - ./smaep_cli -t -e "2 * (3 + 4)"
+    - ./smaep_cli -t -e "(data[\$.A.x] + data[\$.B.x])/2" -f ../../../smaep_cli/samples/*.json

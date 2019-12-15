@@ -90,7 +90,7 @@ struct expression;
 template <typename TNumber>
 struct parentheses : if_must<one<'('>, expression<TNumber>, one<')'>> {};
 
-struct data_key : identifier {};
+struct data_key : plus<not_one<']'>> {};
 
 struct data_variable
     : if_must<string<'d', 'a', 't', 'a', '['>, data_key, one<']'>> {};

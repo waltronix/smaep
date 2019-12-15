@@ -19,6 +19,43 @@ TEST_CASE("some_simple_jsonpath", "json_tests") {
   REQUIRE(1 == rs);
 }
 
+TEST_CASE("nested jsonpath", "json_tests") {
+  const std::string json = R"JSON(
+{
+  "A": {
+    "x": "1",
+    "y": "2"
+  },
+  "B": {
+    "x": "3",
+    "y": "4"
+  }
+}
+)JSON";
+
+  smaep::data::json_source<double> jw(json);
+
+  REQUIRE(1 == jw.get_value_for("$.A.x"));
+  REQUIRE(3 == jw.get_value_for("$.B.x"));
+}
+
+TEST_CASE("select temp", "json_tests") {
+  const std::string json = R"JSON(
+{
+    "A": {
+        "temp": "25.71",
+        "pressure": "1013",
+        "humidity": "53"
+    }
+}
+)JSON";
+
+  smaep::data::json_source<double> jw(json);
+
+  auto temp = jw.get_value_for("$..temp");
+  REQUIRE(25.71 == temp);
+}
+
 TEST_CASE("no_result", "json_tests") {
   const std::string json = R"JSON(
  {
