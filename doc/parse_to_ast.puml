@@ -1,0 +1,37 @@
+@startuml parse_to_ast
+
+boundary smaep
+participant tree_nursery
+collections nodes
+boundary pegtl
+
+[-> smaep: parse(\n  expression, \n  operators);
+activate smaep
+    smaep -> tree_nursery **
+    activate tree_nursery #LightGreen
+        smaep -> pegtl: parse\n  <grammar, actions>\n  (expr, ops, tr);
+        activate pegtl
+            group during expression parsing 
+                opt value
+                    pegtl -> pegtl: make node
+                    pegtl -> nodes**
+                    activate nodes #LightSalmon
+                    pegtl -> tree_nursery: push(node)
+                else operation or function
+                    pegtl -> tree_nursery: push(&function)
+                end
+            end
+        pegtl --> smaep
+        deactivate pegtl
+
+        smaep -> tree_nursery: get_ast()
+        activate tree_nursery
+            tree_nursery -> nodes: transfer\n ownership\n of nodes
+        smaep <-- tree_nursery
+        deactivate tree_nursery
+        
+        [<- smaep: ast
+    destroy tree_nursery
+deactivate smaep
+
+@enduml
