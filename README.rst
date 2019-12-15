@@ -16,6 +16,9 @@ and PEGTL_ to parse something by using grammar.
 smaep can be used as a command line calculator. But it is also possible to
 reuse a parsed expression with different sets of data.
 
+I use gitlab for CI, so have a look at https://gitlab.com/waltronix/smaep if 
+you want to have a closer look at the build results and some sample calls.
+
 Usage
 -----
 
@@ -24,42 +27,51 @@ arguments.
 
 ::
 
-    > smaep "1 + 1"
-
+    > smaep_cli -e "1 + 1"
+      
+        1 + 1
+      
       1 + 1 = 2
 
-Printing the syntax tree can be activated by using **-a**.
+
+Printing the syntax tree can be activated by using **-t**.
 At the moment, the address of the tree items is printed as identifier.
 ::
 
-    > smaep -a "(3^2 + 4^2)^(0.5)"
-
-      (3^2 + 4^2)^(0.5) = 5
-
-    ast
-       └ ^                             - 0x0x55a0e473dbd0
-         └ +                           - 0x0x55a0e473de00
-           └ ^                         - 0x0x55a0e473ded0
-             └ 3.000000                - 0x0x55a0e473d0b0
-             └ 2.000000                - 0x0x55a0e473d520
-           └ ^                         - 0x0x55a0e473da90
-             └ 4.000000                - 0x0x55a0e473e030
-             └ 2.000000                - 0x0x55a0e473c1f0
-         └ 0.500000                    - 0x0x55a0e473bdf0
+    > smaep_cli -t -e "(3 + 4)/2"
+      
+        (3 + 4)/2
+      
+      
+      ast
+         └ /                             - 0x0x55d181024b90
+           └ +                           - 0x0x55d181024c60
+             └ 3.000000                  - 0x0x55d181023030
+             └ 4.000000                  - 0x0x55d181024250
+           └ 2.000000                    - 0x0x55d181025260
+      
+      (3 + 4)/2 = 3.5
 
 In addition, it is possible to add a *data source* that can be queried during
-evaluation of the expression. The command line tool contains some *lookups* for
-the numbers from one to ten.
+evaluation of the expression. The command line tool is able to query data from
+json files via json path.
 ::
 
-    > smaep "1 + data[one]" -a
+    > smaep_cli -t -e "(data[\$.A.x] + data[\$.B.x])/2" -f smaep_cli/samples/temp_0*                                                                                                                         
+      
+        (data[$.A.x] + data[$.B.x])/2
+      
+      
+      ast
+         └ /                             - 0x0x55eda6c57c00
+           └ +                           - 0x0x55eda6c57e30
+             └ "$.A.x"                   - 0x0x55eda6c57f00
+             └ "$.B.x"                   - 0x0x55eda6c57ac0
+           └ 2.000000                    - 0x0x55eda6c57060
+      
+      smaep_cli/samples/temp_01.json : 2
+      smaep_cli/samples/temp_02.json : 6
 
-      1 + data[one] = 2
-
-    ast
-       └ +                             - 0x0x5571084a7eb0
-         └ 1.000000                    - 0x0x5571084a6300
-         └ "one"                       - 0x0x5571084a7de0
 
 Thanks to
 ---------
@@ -69,6 +81,7 @@ My special thanks go to the following projects:
 * https://github.com/taocpp/PEGTL
 * https://github.com/danielaparker/jsoncons
 * https://github.com/catchorg/Catch2
+* https://github.com/CLIUtils/CLI11
 
 * https://cliutils.gitlab.io/modern-cmake/
 
