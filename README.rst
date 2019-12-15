@@ -99,7 +99,7 @@ The following diagram give a rough overview, on what happens during parsing.
 
 The single values, operators and functions are extracted by PEGTL_ 
 and pushed into the `tree_nursery`. In there, they are converted into a tree
-by using the 'Shunting Yard Algorithm'_. And thats it.
+by using the `Shunting Yard Algorithm`_. And thats it.
 
 .. _Shunting Yard Algorithm: https://en.wikipedia.org/wiki/Shunting-yard_algorithm
 
