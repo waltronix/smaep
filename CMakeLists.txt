@@ -24,12 +24,11 @@ if(MSVC)
   endforeach()
 endif()
 
-option(BUILD_CLI_TOOL "Build the smaep cli calculator." ON)
-option(BUILD_JSON_SOURCE "Build json data source." ON)
-option(BUILD_TESTS "Build unit tests for all components." ON)
+option(SMAEP_BUILD_CLI_TOOL "Build the smaep cli calculator." ON)
+option(SMAEP_BUILD_JSON_SOURCE "Build json data source." ON)
+option(SMAEP_BUILD_TESTS "Build unit tests for all components." ON)
 
-
-if(BUILD_TESTS)
+if(SMAEP_BUILD_TESTS)
   FetchContent_Declare(
     catch
     GIT_REPOSITORY https://github.com/catchorg/Catch2.git
@@ -43,14 +42,14 @@ endif()
 
 add_subdirectory("./smaep")
 
-if(BUILD_CLI_TOOL)
-  set(BUILD_JSON_SOURCE ON)
+if(SMAEP_BUILD_CLI_TOOL)
+  set(SMAEP_BUILD_JSON_SOURCE ON)
 endif()
 
-if(BUILD_JSON_SOURCE)
+if(SMAEP_BUILD_JSON_SOURCE)
   add_subdirectory("./json_source")
 endif()
 
-if(BUILD_CLI_TOOL)
+if(SMAEP_BUILD_CLI_TOOL)
   add_subdirectory("./smaep_cli")
 endif()

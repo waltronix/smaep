@@ -93,13 +93,13 @@ smaep is build using cmake.
 
 There are some options to control what to build.
 
-BUILD_CLI_TOOL 
+SMAEP_BUILD_CLI_TOOL 
   Build the smaep cli calculator.
 
-BUILD_JSON_SOURCE 
+SMAEP_BUILD_JSON_SOURCE 
   Build json data source.
 
-BUILD_TESTS 
+SMAEP_BUILD_TESTS 
   Build unit tests for all components.
 
 By default these options are activated.
