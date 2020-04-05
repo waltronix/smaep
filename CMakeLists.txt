@@ -27,6 +27,7 @@ endif()
 option(SMAEP_BUILD_CLI_TOOL "Build the smaep cli calculator." ON)
 option(SMAEP_BUILD_JSON_SOURCE "Build json data source." ON)
 option(SMAEP_BUILD_TESTS "Build unit tests for all components." ON)
+option(SMAEP_CODE_COVERAGE "Enable clang code coverage for tests." ON)
 
 if(SMAEP_BUILD_TESTS)
   FetchContent_Declare(
