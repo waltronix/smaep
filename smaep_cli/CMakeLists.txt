@@ -12,4 +12,4 @@ target_include_directories(smaep_cli
                            PUBLIC 
                            ${cli11_SOURCE_DIR}/include 
                            ./include)
-target_link_libraries(smaep_cli PRIVATE smaep json_source stdc++fs)
+target_link_libraries(smaep_cli PRIVATE smaep json_source $<IF:$<PLATFORM_ID:Linux>,stdc++fs,>)
