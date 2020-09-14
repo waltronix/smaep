@@ -5,13 +5,13 @@ smaep is a **SMA**\ ll **E**\ xpression **P**\ arser.
 It can parse simple mathematical expressions into an abstract syntax tree and
 evaluate or print that tree.
 
-I started smaep, because I wanted to use LLVM_ to build a JIT compiler
-(as explained in the the KaleidoscopeJIT_ tutorial)
-and PEGTL_ to parse something by using grammar.
+.. I started smaep, because I wanted to use LLVM_ to build a JIT compiler
+.. (as explained in the the KaleidoscopeJIT_ tutorial)
+.. and PEGTL_ to parse something by using grammar.
 
-.. _LLVM: https://llvm.org
-.. _KaleidoscopeJIT: https://llvm.org/docs/tutorial/BuildingAJIT1.html
-.. _PEGTL: https://github.com/taocpp/PEGTL
+.. .. _LLVM: https://llvm.org
+.. .. _KaleidoscopeJIT: https://llvm.org/docs/tutorial/BuildingAJIT1.html
+.. .. _PEGTL: https://github.com/taocpp/PEGTL
 
 smaep can be used as a command line calculator. But it is also possible to
 reuse a parsed expression with different sets of data.
@@ -84,7 +84,7 @@ My special thanks go to the following projects:
 * https://github.com/CLIUtils/CLI11
 
 * https://cliutils.gitlab.io/modern-cmake/
-
+* https://github.com/StableCoder/cmake-scripts
 
 How to build
 ------------
