@@ -1,4 +1,4 @@
-image: rikorose/gcc-cmake
+image: silkeh/clang:10
 
 build:
   stage: build
