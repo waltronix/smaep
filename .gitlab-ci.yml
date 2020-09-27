@@ -1,4 +1,4 @@
-image: waltronix/ubuntucppbuild:latest
+image: waltronix/ubuntu-cpp-build:latest
 
 build:
   stage: build
