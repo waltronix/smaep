@@ -1,4 +1,4 @@
-image: waltronix/alpine-build:latest
+image: waltronix/ubuntucppbuild:latest
 
 build:
   stage: build
