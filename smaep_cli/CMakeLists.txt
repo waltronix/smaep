@@ -3,7 +3,8 @@ project(smaep_cli)
 
 FetchContent_Declare(
   cli11
-  URL https://github.com/CLIUtils/CLI11/archive/v1.9.1.zip)
+  GIT_REPOSITORY https://github.com/CLIUtils/CLI11
+  GIT_TAG v1.9.1)
 FetchContent_Populate(cli11)
 message(STATUS "cli11 is available in " ${cli11_SOURCE_DIR})
 
