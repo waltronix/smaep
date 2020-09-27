@@ -42,5 +42,6 @@ add_custom_command(OUTPUT smaep_test.lcov
                    MAIN_DEPENDENCY smaep_test.profdata)
 
 add_custom_target(cover_smaep_test 
-                  COMMAND echo "something to show?"
+                  COMMAND llvm-cov-10 report ./smaep_test -instr-profile=smaep_test.profdata -ignore-filename-regex="\(_deps|test_\)"
+                  COMMAND echo "created test reports"
                   DEPENDS cov_html/index.html smaep_test.lcov)
