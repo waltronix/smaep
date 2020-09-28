@@ -20,45 +20,52 @@ if(SMAEP_BUILD_TESTS)
     smaep_test PRIVATE ${pegtl_SOURCE_DIR}/include
                        ${catch_SOURCE_DIR}/single_include ./include)
 
-  target_compile_options(smaep_test PRIVATE -fprofile-instr-generate
-                                            -fcoverage-mapping)
-  target_link_options(smaep_test PRIVATE -fprofile-instr-generate
-                      -fcoverage-mapping)
-
   add_test(NAME smaep_test COMMAND smaep_test)
 endif()
 
-set(exe_path ${CMAKE_CURRENT_SOURCE_DIR}/smaep_test)
+function(add_coverage target)
+  message("adding code coverage to target: ${target}")
 
-add_custom_command(
-  OUTPUT smaep_test.profraw
-  COMMAND LLVM_PROFILE_FILE=smaep_test.profraw ./smaep_test
-  DEPENDS smaep_test)
+  target_compile_options(${target} PRIVATE -fprofile-instr-generate
+                                           -fcoverage-mapping)
+  target_link_options(${target} PRIVATE -fprofile-instr-generate
+                      -fcoverage-mapping)
 
-add_custom_command(
-  OUTPUT smaep_test.profdata
-  COMMAND llvm-profdata-10 merge -sparse smaep_test.profraw -o
-          smaep_test.profdata
-  MAIN_DEPENDENCY smaep_test.profraw)
+  set(no_cover_regex \"\(_deps|test_\)\")
 
-add_custom_command(
-  OUTPUT cov_html/index.html
-  COMMAND
-    llvm-cov-10 show ./smaep_test -instr-profile=smaep_test.profdata
-    -output-dir=./cov_html -format=html -ignore-filename-regex="\(_deps|test_\)"
-    -show-instantiations=false
-  MAIN_DEPENDENCY smaep_test.profdata)
+  add_custom_command(
+    OUTPUT ${target}.profraw
+    COMMAND LLVM_PROFILE_FILE=${target}.profraw ./${target}
+    DEPENDS ${target})
 
-add_custom_command(
-  OUTPUT smaep_test.lcov
-  COMMAND
-    llvm-cov-10 export ./smaep_test -instr-profile=smaep_test.profdata
-    -format=lcov -ignore-filename-regex="\(_deps|test_\)" > smaep_test.lcov
-  MAIN_DEPENDENCY smaep_test.profdata)
+  add_custom_command(
+    OUTPUT ${target}.profdata
+    COMMAND llvm-profdata-10 merge -sparse ${target}.profraw -o
+            ${target}.profdata
+    MAIN_DEPENDENCY ${target}.profraw)
 
-add_custom_target(
-  cover_smaep_test
-  COMMAND llvm-cov-10 report ./smaep_test -instr-profile=smaep_test.profdata
-          -ignore-filename-regex="\(_deps|test_\)"
-  COMMAND echo "created test reports"
-  DEPENDS cov_html/index.html smaep_test.lcov)
+  add_custom_command(
+    OUTPUT cov_html_${target}/index.html
+    COMMAND
+      llvm-cov-10 show ./${target} -instr-profile=${target}.profdata
+      -output-dir=./cov_html_${target} -format=html
+      -ignore-filename-regex=${no_cover_regex} -show-instantiations=false
+    MAIN_DEPENDENCY ${target}.profdata)
+
+  add_custom_command(
+    OUTPUT ${target}.lcov
+    COMMAND
+      llvm-cov-10 export ./${target} -instr-profile=${target}.profdata
+      -format=lcov -ignore-filename-regex=${no_cover_regex} > ${target}.lcov
+    MAIN_DEPENDENCY ${target}.profdata)
+
+  add_custom_target(
+    cover_${target}
+    COMMAND llvm-cov-10 report ./${target} -instr-profile=${target}.profdata
+            -ignore-filename-regex=${no_cover_regex}
+    COMMAND echo "created test reports"
+    DEPENDS cov_html_${target}/index.html ${target}.lcov)
+
+endfunction()
+
+add_coverage(smaep_test)
