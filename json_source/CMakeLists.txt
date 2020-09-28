@@ -9,8 +9,8 @@ FetchContent_Populate(jsoncons)
 message(STATUS "jsoncons is available in " ${jsoncons_SOURCE_DIR})
 
 add_library(json_source STATIC src/json_source.cpp)
-target_include_directories(json_source
-                           PUBLIC ${jsoncons_SOURCE_DIR}/include ./include)
+target_include_directories(json_source PUBLIC ${jsoncons_SOURCE_DIR}/include
+                                              ./include)
 target_link_libraries(json_source PUBLIC smaep)
 
 if(BUILD_TESTS)

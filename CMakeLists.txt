@@ -3,27 +3,17 @@ project(smaep)
 
 set(CMAKE_CXX_STANDARD 17)
 
-#set(FETCHCONTENT_BASE_DIR ${CMAKE_SOURCE_DIR}/3rdParty CACHE PATH "Download path for 3rdParty stuff")
+# set(FETCHCONTENT_BASE_DIR ${CMAKE_SOURCE_DIR}/3rdParty CACHE PATH "Download
+# path for 3rdParty stuff")
 include(FetchContent)
-
-set(CMAKE_MODULE_PATH
-    "${CMAKE_CURRENT_LIST_DIR}/CMakeModules"
-)
 
 # force static runtime libraries for msvc builds
 if(MSVC)
-  set(variables
-      CMAKE_CXX_FLAGS_DEBUG
-      CMAKE_CXX_FLAGS_RELEASE
-      CMAKE_CXX_FLAGS_RELWITHDEBINFO
-      CMAKE_CXX_FLAGS_MINSIZEREL)
+  set(variables CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+                CMAKE_CXX_FLAGS_RELWITHDEBINFO CMAKE_CXX_FLAGS_MINSIZEREL)
   foreach(variable ${variables})
     if(${variable} MATCHES "/MD")
-      string(REGEX
-             REPLACE "/MD"
-                     "/MT"
-                     ${variable}
-                     "${${variable}}")
+      string(REGEX REPLACE "/MD" "/MT" ${variable} "${${variable}}")
     endif()
   endforeach()
 endif()
@@ -37,17 +27,11 @@ if(SMAEP_BUILD_TESTS)
   FetchContent_Declare(
     catch
     GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG        v2.9.1
-  )
+    GIT_TAG v2.9.1)
   FetchContent_Populate(catch)
   message(STATUS "catch is available in " ${catch_SOURCE_DIR})
 
   enable_testing()
-endif()
-
-if(SMAEP_CODE_COVERAGE)
-  include(code-coverage)
-  add_code_coverage()
 endif()
 
 add_subdirectory("./smaep")
