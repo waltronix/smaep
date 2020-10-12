@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
 project(smaep)
 
+include(CMakeModules/clang-cover.cmake)
+
 set(CMAKE_CXX_STANDARD 17)
 
 # set(FETCHCONTENT_BASE_DIR ${CMAKE_SOURCE_DIR}/3rdParty CACHE PATH "Download

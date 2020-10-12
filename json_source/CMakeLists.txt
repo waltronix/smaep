@@ -13,7 +13,7 @@ target_include_directories(json_source PUBLIC ${jsoncons_SOURCE_DIR}/include
                                               ./include)
 target_link_libraries(json_source PUBLIC smaep)
 
-if(BUILD_TESTS)
+if(SMAEP_BUILD_TESTS)
   file(GLOB TEST_SRC "test/*.cpp")
 
   add_executable(json_source_test ${TEST_SRC})
@@ -23,3 +23,5 @@ if(BUILD_TESTS)
 
   add_test(NAME json_source_test COMMAND json_source_test)
 endif()
+
+add_coverage(json_source_test)

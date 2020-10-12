@@ -19,39 +19,34 @@ enum class order : uint8_t {
   max = std::numeric_limits<uint8_t>::max()
 };
 
-template <typename TValue, typename... TInputs>
-struct operation {
+template <typename TValue, typename... TInputs> struct operation {
   std::string name;
   order precedence;
   std::function<TValue(TInputs...)> function;
 };
 
-template <typename TValue>
-class parser_config {
- private:
+template <typename TValue> class parser_config {
+private:
   std::map<std::string, operation<TValue, TValue, TValue>> m_infix_operators;
   std::map<std::string, operation<TValue, TValue>> m_functions;
 
- public:
-  void add_operator(const std::string& name,
-                    const order precedence,
-                    const std::function<TValue(TValue, TValue)>& operation) {
+public:
+  void add_operator(const std::string &name, const order precedence,
+                    const std::function<TValue(TValue, TValue)> &operation) {
     m_infix_operators.insert({name, {name, precedence, operation}});
   }
 
-  void add_function(const std::string& name,
-                    const order precedence,
-                    const std::function<TValue(TValue)>& function) {
+  void add_function(const std::string &name, const order precedence,
+                    const std::function<TValue(TValue)> &function) {
     m_functions.insert({name, {name, precedence, function}});
   }
 
-  const auto& operators() const { return m_infix_operators; }
+  const auto &operators() const { return m_infix_operators; }
 
-  const auto& functions() const { return m_functions; }
+  const auto &functions() const { return m_functions; }
 };
 
-template <typename TValue>
-auto create_parser_config() {
+template <typename TValue> auto create_parser_config() {
   auto config = std::make_shared<parser_config<TValue>>();
 
   config->add_operator(
@@ -81,4 +76,4 @@ auto create_parser_config() {
   return config;
 }
 
-}  // namespace smaep
+} // namespace smaep

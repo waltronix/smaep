@@ -14,7 +14,7 @@ namespace pegtl = tao::TAO_PEGTL_NAMESPACE;
 
 namespace smaep {
 template <typename TValue>
-ast<TValue> parse(const std::string& expression,
+ast<TValue> parse(const std::string &expression,
                   std::shared_ptr<smaep::parser_config<TValue>> parser_config =
                       smaep::create_parser_config<TValue>()) {
   pegtl::analyze<smaep::grammar::grammar<TValue>>();
@@ -25,7 +25,7 @@ ast<TValue> parse(const std::string& expression,
   try {
     pegtl::parse<grammar::grammar<TValue>, grammar::action>(
         input, parser_config, tree_nursery);
-  } catch (const grammar::parse_error& e) {
+  } catch (const grammar::parse_error &e) {
     const auto p = e.positions.front();
     std::cerr << e.what() << std::endl
               << input.line_at(p) << std::endl
@@ -35,4 +35,4 @@ ast<TValue> parse(const std::string& expression,
 
   return {parser_config, tree_nursery.get_ast()};
 }
-}  // namespace smaep
+} // namespace smaep
