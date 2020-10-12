@@ -1,3 +1,8 @@
+.. |pipeline status| image:: https://gitlab.com/waltronix/smaep/badges/main/pipeline.svg
+   :target:
+.. |coverage report| image:: https://gitlab.com/waltronix/smaep/badges/main/coverage.svg
+   :target:
+
 smaep
 =====
 
