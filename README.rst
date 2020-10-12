@@ -1,7 +1,7 @@
-.. |pipeline status| image:: https://gitlab.com/waltronix/smaep/badges/main/pipeline.svg
-   :target:
-.. |coverage report| image:: https://gitlab.com/waltronix/smaep/badges/main/coverage.svg
-   :target:
+.. image:: https://gitlab.com/waltronix/smaep/badges/main/pipeline.svg
+   :alt: pipeline status
+.. image:: https://gitlab.com/waltronix/smaep/badges/main/coverage.svg
+   :alt: code coverage
 
 smaep
 =====
