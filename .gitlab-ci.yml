@@ -1,4 +1,4 @@
-image: rikorose/gcc-cmake
+image: waltronix/ubuntu-cpp-build:latest
 
 build:
   stage: build
@@ -6,6 +6,7 @@ build:
   script:
     - cmake . -B out/gitlab
     - cmake --build out/gitlab --target all
+    - cmake --build out/gitlab --target cover_smaep_test
     - cd out/gitlab
     - ctest
     - cd ./smaep_cli

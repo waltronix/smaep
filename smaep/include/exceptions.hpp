@@ -5,20 +5,20 @@
 
 namespace smaep {
 class smaep_exceptions : public std::exception {
- protected:
+protected:
   std::string m_message;
 
- public:
+public:
   smaep_exceptions(std::string message) : m_message(std::move(message)) {}
 };
 
 class data_exception : public smaep_exceptions {
- public:
+public:
   using smaep_exceptions::smaep_exceptions;
 };
 
 class parsing_excpetion : public smaep_exceptions {
- public:
+public:
   using smaep_exceptions::smaep_exceptions;
 };
-}  // namespace smaep
+} // namespace smaep

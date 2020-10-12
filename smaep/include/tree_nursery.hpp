@@ -12,9 +12,8 @@ namespace smaep {
 /** Class that takes care of an operand and an operator stack for shift-reduce
  *  style handling of operator priority
  */
-template <typename TValue>
-class tree_nursery : public i_tree_nursery<TValue> {
- public:
+template <typename TValue> class tree_nursery : public i_tree_nursery<TValue> {
+public:
   tree_nursery() {
     // we initialize the operator stack with an opening parenthesis, so we can
     // be sure there is always an element and do not always have to check
@@ -29,13 +28,13 @@ class tree_nursery : public i_tree_nursery<TValue> {
     m_operands.push(std::make_unique<const_node<TValue>>(value));
   }
 
-  void push_operand(const std::string& s) override {
+  void push_operand(const std::string &s) override {
     m_operands.push(std::make_unique<var_node<TValue>>(s));
   }
 
   /** When pushing operations, we have to take care of operator precedence. */
-  void push_operation(
-      const operation<TValue, TValue, TValue>& operation) override {
+  void
+  push_operation(const operation<TValue, TValue, TValue> &operation) override {
     while (m_operations.top().first <= operation.precedence) {
       // new operator has higher precedence than last one
       apply_one_operation();
@@ -43,7 +42,7 @@ class tree_nursery : public i_tree_nursery<TValue> {
     m_operations.push({operation.precedence, make_node(operation)});
   }
 
-  void push_function(const operation<TValue, TValue>& function) override {
+  void push_function(const operation<TValue, TValue> &function) override {
     m_operations.push({function.precedence, make_node(function)});
   }
 
@@ -58,7 +57,7 @@ class tree_nursery : public i_tree_nursery<TValue> {
 
   std::unique_ptr<inode<TValue>> get_ast() override { return make_subtree(); }
 
- private:
+private:
   std::stack<std::unique_ptr<inode<TValue>>> m_operands;
   std::stack<std::pair<order, std::unique_ptr<i_function_node<TValue>>>>
       m_operations;
@@ -93,8 +92,8 @@ class tree_nursery : public i_tree_nursery<TValue> {
 
     // we have a function on the operator stack
     if (1 == N) {
-      function_node<TValue, TValue>& operator_ref =
-          *(dynamic_cast<function_node<TValue, TValue>*>(operation.get()));
+      function_node<TValue, TValue> &operator_ref =
+          *(dynamic_cast<function_node<TValue, TValue> *>(operation.get()));
 
       std::unique_ptr<inode<TValue>> arg = std::move(m_operands.top());
       m_operands.pop();
@@ -104,8 +103,8 @@ class tree_nursery : public i_tree_nursery<TValue> {
 
     // we have an infix operator on the operator stack
     if (2 == N) {
-      function_node<TValue, TValue, TValue>& operator_ref =
-          *(dynamic_cast<function_node<TValue, TValue, TValue>*>(
+      function_node<TValue, TValue, TValue> &operator_ref =
+          *(dynamic_cast<function_node<TValue, TValue, TValue> *>(
               operation.get()));
 
       std::unique_ptr<inode<TValue>> right = std::move(m_operands.top());
@@ -122,4 +121,4 @@ class tree_nursery : public i_tree_nursery<TValue> {
     push_operand(std::move(operation));
   }
 };
-}  // namespace smaep
+} // namespace smaep
