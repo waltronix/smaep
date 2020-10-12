@@ -1,7 +1,9 @@
-.. image:: https://gitlab.com/waltronix/smaep/badges/main/pipeline.svg
-   :alt: pipeline status
-.. image:: https://gitlab.com/waltronix/smaep/badges/main/coverage.svg
-   :alt: code coverage
+|pipeline status| |code coverage|
+
+.. |pipeline status| image:: https://gitlab.com/waltronix/smaep/badges/main/pipeline.svg
+   :alt: | pipeline status |
+.. |code coverage| image:: https://gitlab.com/waltronix/smaep/badges/main/coverage.svg
+   :alt: | code coverage |
 
 smaep
 =====
