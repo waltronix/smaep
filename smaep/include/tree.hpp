@@ -19,28 +19,8 @@ template <typename TValue> struct inode {
   virtual std::string to_string() = 0;
 
   virtual void to_dot(std::ostream &dot, uint32_t inc = 0) {
-    dot << std::string(2 * inc, ' ') << " └ " << std::left
-        << std::setw(30 - 2 * inc) << to_string() << "  - 0x" << this
+    dot << std::string(2 * inc, ' ') << " └ " << std::left << to_string()
         << std::endl;
-  }
-};
-
-template <typename TValue> struct ast {
-  const std::shared_ptr<parser_config<TValue>> operations;
-  const std::unique_ptr<inode<TValue>> node;
-
-  TValue value() { return node->value(); }
-
-  TValue value(const data::i_data_source<TValue> &data) {
-    return node->value(data);
-  }
-
-  std::string to_dot() {
-    std::stringstream dot;
-    dot << "ast" << std::endl;
-    node->to_dot(dot, 1);
-
-    return dot.str();
   }
 };
 
@@ -126,20 +106,30 @@ public:
   }
 };
 
-template <typename TValue>
-std::unique_ptr<const_node<TValue>> make_node(TValue value) {
-  return std::make_unique<const_node<TValue>>(value);
-}
-
-template <typename TValue>
-std::unique_ptr<var_node<TValue>> make_node(std::string selector) {
-  return std::make_unique<var_node<TValue>>(selector);
-}
-
 template <typename TOut, typename... TIn>
 std::unique_ptr<function_node<TOut, TIn...>>
 make_node(const operation<TOut, TIn...> &op) {
   return std::make_unique<function_node<TOut, TIn...>>(
       op, std::make_unique<const_node<TIn>>(0)...);
 }
+
+template <typename TValue> struct ast {
+  const std::shared_ptr<parser_config<TValue>> operations;
+  const std::unique_ptr<inode<TValue>> node;
+
+  TValue value() { return node->value(); }
+
+  TValue value(const data::i_data_source<TValue> &data) {
+    return node->value(data);
+  }
+
+  std::string to_dot() {
+    std::stringstream dot;
+    dot << "ast" << std::endl;
+    node->to_dot(dot, 1);
+
+    return dot.str();
+  }
+};
+
 }; // namespace smaep
