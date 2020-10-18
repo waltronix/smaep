@@ -3,8 +3,8 @@
 #include <memory>
 #include <string>
 
-#include "operators.hpp"
-#include "tree.hpp"
+#include "smaep/operators.hpp"
+#include "smaep/tree.hpp"
 
 namespace smaep {
 template <typename TValue>

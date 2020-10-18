@@ -6,9 +6,9 @@
 // a grammar for possible infinite cycles.
 #include <tao/pegtl/analyze.hpp>
 
-#include "grammar.hpp"
-#include "tree.hpp"
-#include "tree_nursery.hpp"
+#include "smaep/grammar.hpp"
+#include "smaep/tree.hpp"
+#include "smaep/tree_nursery.hpp"
 
 namespace pegtl = tao::TAO_PEGTL_NAMESPACE;
 
@@ -16,7 +16,7 @@ namespace smaep {
 template <typename TValue>
 ast<TValue> parse(const std::string &expression,
                   std::shared_ptr<smaep::parser_config<TValue>> parser_config =
-                      smaep::create_parser_config<TValue>()) {
+                      smaep::parser_config<TValue>::create()) {
   pegtl::analyze<smaep::grammar::grammar<TValue>>();
 
   pegtl::memory_input<> input(expression, "");

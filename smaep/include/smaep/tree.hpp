@@ -7,8 +7,8 @@
 #include <string>
 #include <tuple>
 
-#include "i_data_source.h"
-#include "operators.hpp"
+#include "smaep/i_data_source.h"
+#include "smaep/operators.hpp"
 
 namespace smaep {
 template <typename TValue> struct inode {

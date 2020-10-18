@@ -8,7 +8,7 @@
 #pragma clang diagnostic pop
 #endif
 
-#include "exceptions.hpp"
+#include "smaep/exceptions.hpp"
 #include "json_source.h"
 
 jsoncons::json smaep::data::json_source_base::query(

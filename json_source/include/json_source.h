@@ -12,8 +12,8 @@
 #pragma clang diagnostic pop
 #endif
 
-#include "exceptions.hpp"
-#include "i_data_source.h"
+#include "smaep/exceptions.hpp"
+#include "smaep/i_data_source.h"
 
 namespace smaep::data {
 class json_source_base {

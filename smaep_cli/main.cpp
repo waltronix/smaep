@@ -6,7 +6,7 @@
 #include "CLI/CLI.hpp"
 
 #include "json_source.h"
-#include "parser.hpp"
+#include "smaep.h"
 
 int main(int argc, char **argv) {
     CLI::App app{"smaep"};
@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     CLI11_PARSE(app, argc, argv);
 
     try {
-      auto ast = smaep::parse<double>(expression);
+      auto ast = smaep::parse_double(expression);
 
       std::cout << std::endl << "  " 
                 << expression 

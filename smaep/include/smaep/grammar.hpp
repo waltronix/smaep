@@ -10,8 +10,8 @@
 #include <tao/pegtl.hpp>
 namespace pegtl = tao::TAO_PEGTL_NAMESPACE;
 
-#include "i_tree_nursery.h"
-#include "operators.hpp"
+#include "smaep/i_tree_nursery.h"
+#include "smaep/operators.hpp"
 
 namespace smaep::grammar {
 // Here the actual grammar starts.

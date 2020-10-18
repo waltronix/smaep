@@ -3,10 +3,10 @@
 #include <memory>
 #include <stack>
 
-#include "i_tree_nursery.h"
+#include "smaep/i_tree_nursery.h"
 
-#include "operators.hpp"
-#include "tree.hpp"
+#include "smaep/operators.hpp"
+#include "smaep/tree.hpp"
 
 namespace smaep {
 /** Class that takes care of an operand and an operator stack for shift-reduce
