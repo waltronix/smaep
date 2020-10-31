@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.16)
 project(smaep)
 
 include(CMakeModules/clang-cover.cmake)
@@ -28,8 +28,7 @@ option(SMAEP_CODE_COVERAGE "Enable clang code coverage for tests." ON)
 if(SMAEP_BUILD_TESTS)
   FetchContent_Declare(
     catch
-    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG v2.9.1)
+    URL https://github.com/catchorg/Catch2/archive/v2.13.3.zip)
   FetchContent_Populate(catch)
   message(STATUS "catch is available in " ${catch_SOURCE_DIR})
 

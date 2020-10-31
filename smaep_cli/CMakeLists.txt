@@ -1,10 +1,9 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.16)
 project(smaep_cli)
 
 FetchContent_Declare(
   cli11
-  GIT_REPOSITORY https://github.com/CLIUtils/CLI11
-  GIT_TAG v1.9.1)
+  URL https://github.com/CLIUtils/CLI11/archive/v1.9.1.zip)
 FetchContent_Populate(cli11)
 message(STATUS "cli11 is available in " ${cli11_SOURCE_DIR})
 

@@ -1,10 +1,9 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.16)
 project(json_source)
 
 FetchContent_Declare(
   jsoncons
-  GIT_REPOSITORY https://github.com/danielaparker/jsoncons.git
-  GIT_TAG v0.140.0)
+  URL https://github.com/danielaparker/jsoncons/archive/v0.158.0.zip)
 FetchContent_Populate(jsoncons)
 message(STATUS "jsoncons is available in " ${jsoncons_SOURCE_DIR})
 

@@ -1,10 +1,9 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.16)
 project(smaep)
 
 FetchContent_Declare(
   pegtl
-  GIT_REPOSITORY https://github.com/taocpp/PEGTL.git
-  GIT_TAG 2.8.1)
+  URL https://github.com/taocpp/PEGTL/archive/2.8.3.zip)
 FetchContent_Populate(PEGTL)
 message(STATUS "PEGTL is available in " ${pegtl_SOURCE_DIR})
 
