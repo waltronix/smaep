@@ -38,8 +38,8 @@ TEST_CASE("with data source", "[data source]") {
   test_source ds;
 
   auto expressions = std::list<std::tuple<std::string, double>>();
-  //expressions.push_back({"1 + data[one]", 2});
-  //expressions.push_back({"data[two] - data[one]", 1});
+  expressions.push_back({"1 + data[one]", 2});
+  expressions.push_back({"data[two] - data[one]", 1});
   expressions.push_back({"abs(data[two])", 2});
 
   for (const auto &[problem, expected] : expressions) {
