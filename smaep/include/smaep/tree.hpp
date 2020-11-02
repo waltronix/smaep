@@ -55,28 +55,31 @@ template <typename TValue> struct var_node : inode<TValue> {
 };
 
 template <typename TValue> struct i_function_node : inode<TValue> {
-  virtual size_t N() = 0;
+  virtual size_t num_arguments() = 0;
+  virtual void push_argument(std::unique_ptr<inode<TValue>> arg) = 0;
 };
 
 template <typename TValue, typename... TInputs>
 struct function_node : i_function_node<TValue> {
+private:
   const operation<TValue, TInputs...> &op;
-  std::tuple<std::unique_ptr<inode<TInputs>>...> data = {};
 
-  virtual size_t N() final { return sizeof...(TInputs); }
+  using t_data = std::tuple<std::unique_ptr<inode<TInputs>>...>;
+  t_data data = {};
 
-  function_node(const operation<TValue, TInputs...> &operation,
-                std::unique_ptr<inode<TInputs>> &&... input)
-      : op(operation), data(std::move(input)...) {}
-
-  ~function_node() {}
-
-  std::string to_string() override {
-    std::string postfix = (N() == 1) ? "()" : "";
-    return op.name + postfix;
+  template <size_t I = sizeof...(TInputs) - 1, typename TInput>
+  void static push_arg(t_data &data, std::unique_ptr<inode<TInput>> arg) {
+    if (std::get<I>(data) == nullptr) {
+      std::get<I>(data) = std::move(arg);
+    } else {
+      if constexpr (I == 0) {
+        throw std::logic_error("function arguments already satisfied");
+      } else {
+        push_arg<I - 1>(data, std::move(arg));
+      }
+    }
   }
 
-private:
   template <size_t... S> TValue call(std::index_sequence<S...>) {
     return op.function(std::get<S>(data)->value()...);
   }
@@ -88,6 +91,23 @@ private:
   }
 
 public:
+  size_t num_arguments() final { return sizeof...(TInputs); }
+
+  void push_argument(std::unique_ptr<inode<TValue>> arg) final {
+    push_arg(data, std::move(arg));
+  }
+
+  function_node(const operation<TValue, TInputs...> &operation)
+      : op(operation) {}
+
+  ~function_node() {}
+
+  std::string to_string() override {
+
+    std::string postfix = (num_arguments() == 1) ? "()" : "";
+    return op.name + postfix;
+  }
+
   TValue value() final {
     auto S = std::make_index_sequence<sizeof...(TInputs)>();
     return call(S);
@@ -109,8 +129,7 @@ public:
 template <typename TOut, typename... TIn>
 std::unique_ptr<function_node<TOut, TIn...>>
 make_node(const operation<TOut, TIn...> &op) {
-  return std::make_unique<function_node<TOut, TIn...>>(
-      op, std::make_unique<const_node<TIn>>(0)...);
+  return std::make_unique<function_node<TOut, TIn...>>(op);
 }
 
 template <typename TValue> struct ast {

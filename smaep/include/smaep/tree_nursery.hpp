@@ -79,8 +79,6 @@ private:
 
   /** Get one operation from the operator stack, fill it with arguments and push
    * it to the operand stack.
-   * ToDo: Clean this up later - the pointer to ref is not nice and not generic
-   * enough!
    */
   void apply_one_operation() {
     std::unique_ptr<i_function_node<TValue>> operation =
@@ -88,32 +86,10 @@ private:
     m_operations.top().second.release();
     m_operations.pop();
 
-    auto N = operation->N();
-
-    // we have a function on the operator stack
-    if (1 == N) {
-      function_node<TValue, TValue> &operator_ref =
-          *(dynamic_cast<function_node<TValue, TValue> *>(operation.get()));
-
-      std::unique_ptr<inode<TValue>> arg = std::move(m_operands.top());
+    auto num_args = operation->num_arguments();
+    for (auto i = 0; i < num_args; ++i) {
+      operation->push_argument(std::move(m_operands.top()));
       m_operands.pop();
-
-      std::get<0>(operator_ref.data) = std::move(arg);
-    }
-
-    // we have an infix operator on the operator stack
-    if (2 == N) {
-      function_node<TValue, TValue, TValue> &operator_ref =
-          *(dynamic_cast<function_node<TValue, TValue, TValue> *>(
-              operation.get()));
-
-      std::unique_ptr<inode<TValue>> right = std::move(m_operands.top());
-      m_operands.pop();
-      std::unique_ptr<inode<TValue>> left = std::move(m_operands.top());
-      m_operands.pop();
-
-      std::get<0>(operator_ref.data) = std::move(left);
-      std::get<1>(operator_ref.data) = std::move(right);
     }
 
     // now the operation has its arguments applied and can be stored like an

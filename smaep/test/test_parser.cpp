@@ -142,7 +142,7 @@ TEST_CASE("user_defined_function", "parser") {
   expressions.push_back({"my_func(3)", 5});
 
   auto config = smaep::parser_config<int64_t>::create();
-  config->add_function("my_func", smaep::order(1), [](auto x) { return 5; });
+  config->add_function("my_func", [](auto x) { return 5; });
 
   for (const auto &[problem, expected] : expressions) {
     INFO(problem);

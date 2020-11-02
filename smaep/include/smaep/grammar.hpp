@@ -1,7 +1,7 @@
 #pragma once
 
-// Copyright (c) 2014-2019 Dr. Colin Hirsch and Daniel Frey
-// Please see LICENSE for license or visit https://github.com/taocpp/PEGTL/
+// This grammar builds upon the calculator sample from PEGTL
+// https://github.com/taocpp/PEGTL/blob/2.8.3/src/example/pegtl/calculator.cpp
 
 #include <cassert>
 #include <iostream>
