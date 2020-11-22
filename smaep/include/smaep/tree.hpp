@@ -55,7 +55,7 @@ template <typename TValue> struct var_node : inode<TValue> {
 };
 
 template <typename TValue> struct i_function_node : inode<TValue> {
-  virtual size_t num_arguments() = 0;
+  virtual size_t size() = 0;
   virtual void push_argument(std::unique_ptr<inode<TValue>> arg) = 0;
 };
 
@@ -64,20 +64,24 @@ struct function_node : i_function_node<TValue> {
 private:
   const operation<TValue, TInputs...> &op;
 
-  using t_data = std::tuple<std::unique_ptr<inode<TInputs>>...>;
+  static const std::size_t N = sizeof...(TInputs);
+  constexpr size_t size() final { return N; }
+
+
+  using node_ptr = std::unique_ptr<inode<TValue>>;
+  using t_data = std::array<node_ptr, N>;
   t_data data = {};
 
   template <size_t I = sizeof...(TInputs) - 1, typename TInput>
   void static push_arg(t_data &data, std::unique_ptr<inode<TInput>> arg) {
-    if (std::get<I>(data) == nullptr) {
-      std::get<I>(data) = std::move(arg);
-    } else {
-      if constexpr (I == 0) {
-        throw std::logic_error("function arguments already satisfied");
-      } else {
-        push_arg<I - 1>(data, std::move(arg));
+
+    for (size_t i = data.size() - 1; i >= 0; --i) {
+      if (data[i] == nullptr) {
+        data[i] = std::move(arg);
+        return;
       }
     }
+    throw std::logic_error("function arguments already satisfied");
   }
 
   template <size_t... S> TValue call(std::index_sequence<S...>) {
@@ -91,8 +95,6 @@ private:
   }
 
 public:
-  size_t num_arguments() final { return sizeof...(TInputs); }
-
   void push_argument(std::unique_ptr<inode<TValue>> arg) final {
     push_arg(data, std::move(arg));
   }
@@ -104,7 +106,7 @@ public:
 
   std::string to_string() override {
 
-    std::string postfix = (num_arguments() == 1) ? "()" : "";
+    std::string postfix = (size() == 1) ? "()" : "";
     return op.name + postfix;
   }
 

@@ -86,7 +86,7 @@ private:
     m_operations.top().second.release();
     m_operations.pop();
 
-    auto num_args = operation->num_arguments();
+    auto num_args = operation->size();
     for (auto i = 0; i < num_args; ++i) {
       operation->push_argument(std::move(m_operands.top()));
       m_operands.pop();
