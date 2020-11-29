@@ -22,7 +22,13 @@ template <typename TValue> struct inode {
 
   virtual void accept(abstract_visitor<TValue> &visitor) = 0;
 
-  virtual std::string to_string() const = 0;
+  virtual std::ostream &write(std::ostream &out) const = 0;
+
+  std::string to_string() const {
+    std::stringstream stream;
+    stream << *this;
+    return stream.str();
+  };
 
   virtual void to_dot(std::ostream &dot, uint32_t inc = 0) {
     dot << std::string(2 * inc, ' ') << " └ " << std::left << to_string()
@@ -30,10 +36,15 @@ template <typename TValue> struct inode {
   }
 };
 
+template <typename TValue>
+std::ostream &operator<<(std::ostream &out, const inode<TValue> &node) {
+  return node.write(out);
+}
+
 template <typename TValue> class abstract_visitor {
 public:
   ~abstract_visitor() = default;
-  virtual void visit(const inode<TValue>* const node) = 0;
+  virtual void visit(const inode<TValue> *const node) = 0;
 };
 
 template <typename TValue> struct const_node : inode<TValue> {
@@ -45,11 +56,12 @@ template <typename TValue> struct const_node : inode<TValue> {
   TValue value() final { return data; }
   TValue value(const data::i_data_source<TValue> &) final { return data; }
 
-  void accept(abstract_visitor<TValue> &visitor) final {
-    visitor.visit(this);
-  };
+  void accept(abstract_visitor<TValue> &visitor) final { visitor.visit(this); };
 
-  std::string to_string() const override { return std::to_string(data); }
+  std::ostream &write(std::ostream &out) const final {
+    out << data;
+    return out;
+  }
 };
 
 template <typename TValue> struct var_node : inode<TValue> {
@@ -64,11 +76,12 @@ template <typename TValue> struct var_node : inode<TValue> {
     return data.get_value_for(selector);
   }
 
-  void accept(abstract_visitor<TValue> &visitor) final {
-    visitor.visit(this);
-  };
+  void accept(abstract_visitor<TValue> &visitor) final { visitor.visit(this); };
 
-  std::string to_string() const override { return "\"" + selector + "\""; }
+  std::ostream &write(std::ostream &out) const final {
+    out << "\"" << selector << "\"";
+    return out;
+  }
 };
 
 template <typename TValue> struct i_function_node : inode<TValue> {
@@ -120,12 +133,6 @@ public:
 
   ~function_node() {}
 
-  std::string to_string() const override {
-
-    std::string postfix = (size() == 1) ? "()" : "";
-    return op.name + postfix;
-  }
-
   TValue value() final {
     auto S = std::make_index_sequence<sizeof...(TInputs)>();
     return call(S);
@@ -147,6 +154,12 @@ public:
     std::apply(
         [&dot, inc](const auto &... x) { (..., x->to_dot(dot, inc + 1)); },
         data);
+  }
+
+  std::ostream &write(std::ostream &out) const final {
+    std::string postfix = (size() == 1) ? "()" : "";
+    out << op.name << postfix;
+    return out;
   }
 };
 

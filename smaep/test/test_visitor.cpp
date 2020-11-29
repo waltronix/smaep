@@ -10,34 +10,35 @@
 #include "smaep.h"
 
 template <typename TValue>
-class printer : public smaep::abstract_visitor<TValue> {
+class upn_printer : public smaep::abstract_visitor<TValue> {
 private:
   std::stringstream m_stream;
 
 public:
-  void visit(const smaep::inode<TValue>* node) override {
-    auto s = node->to_string();
-    m_stream << s << " ";
+  void visit(const smaep::inode<TValue> *node) override {
+    m_stream << " " << *node;
   }
 
-  std::string str() { return m_stream.str(); }
+  std::string str() { return m_stream.str().substr(1); }
 };
 
 TEST_CASE("print_tree", "visitor") {
 
-  auto expressions = std::list<std::tuple<std::string, double>>();
-  expressions.push_back({"(1 + 1) * 2", 4});
-  expressions.push_back({"2 / (1 + 1)", 1});
-  expressions.push_back({"23 * 2 - 4", 42});
-  expressions.push_back({"sin(1/3)^2 + cos(1/3)^2", 1});
+  auto expressions = std::list<std::tuple<std::string, std::string>>();
+  expressions.push_back({"(1.5 + 1) * 2", "1.5 1 + 2 *"});
+  expressions.push_back({"2 / (1 + 1)", "2 1 1 + /"});
+  expressions.push_back({"23 * 2 - 4", "23 2 * 4 -"});
+  expressions.push_back(
+      {"sin(1/3)^2 + cos(1/3)^2", "1 3 / sin() 2 ^ 1 3 / cos() 2 ^ +"});
 
-  for (const auto &[problem, expected] : expressions) {
+  for (const auto &[problem, expected_upn] : expressions) {
     INFO(problem);
     auto ast = smaep::parse_double(problem);
 
-    printer<double> p;
+    upn_printer<double> p;
     ast.node->accept(p);
-    auto str = p.str();
-    std::cout << str << std::endl;
+    auto result = p.str();
+
+    CHECK(expected_upn == result);
   }
 }
