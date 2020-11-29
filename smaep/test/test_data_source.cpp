@@ -62,22 +62,3 @@ TEST_CASE("no data source", "[data source]") {
     CHECK_THROWS(ast.value());
   }
 }
-
-TEST_CASE("dot printer", "[data source]") {
-
-  const std::string expected_ast = R"xx(ast
-   └ +
-     └ -1
-     └ abs
-       └ -
-         └ "two"
-         └ 3.14
-)xx";
-
-  test_source ds;
-  auto problem = "-1 + abs(data[two]-3.14)";
-  auto ast = smaep::parse<double>(problem);
-  auto result = ast.to_dot();
-
-  CHECK(expected_ast == result);
-}

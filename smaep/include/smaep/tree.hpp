@@ -20,20 +20,10 @@ template <typename TValue> struct inode {
   virtual TValue value() = 0;
   virtual TValue value(const data::i_data_source<TValue> &data) = 0;
 
-  virtual void accept(abstract_visitor<TValue> &visitor) = 0;
+  virtual void accept_pre_order(abstract_visitor<TValue> &visitor) = 0;
+  virtual void accept_post_order(abstract_visitor<TValue> &visitor) = 0;
 
   virtual std::ostream &write(std::ostream &out) const = 0;
-
-  std::string to_string() const {
-    std::stringstream stream;
-    stream << *this;
-    return stream.str();
-  };
-
-  virtual void to_dot(std::ostream &dot, uint32_t inc = 0) {
-    dot << std::string(2 * inc, ' ') << " └ " << std::left << to_string()
-        << std::endl;
-  }
 };
 
 template <typename TValue>
@@ -45,8 +35,8 @@ template <typename TValue> class abstract_visitor {
 public:
   ~abstract_visitor() = default;
   virtual void visit(const inode<TValue> *const node) = 0;
-  // virtual void visit(const inode<TValue> *const node, const inode<TValue>
-  // *const parent) = 0;
+  virtual void push_parent(const inode<TValue> *const node){};
+  virtual void pop_parent(){};
 };
 
 template <typename TValue> struct const_node : inode<TValue> {
@@ -55,12 +45,17 @@ template <typename TValue> struct const_node : inode<TValue> {
   const_node(TValue value) : data(value) {}
   ~const_node() {}
 
-  TValue value() final { return data; }
-  TValue value(const data::i_data_source<TValue> &) final { return data; }
+  TValue value() override { return data; }
+  TValue value(const data::i_data_source<TValue> &) override { return data; }
 
-  void accept(abstract_visitor<TValue> &visitor) final { visitor.visit(this); };
+  void accept_pre_order(abstract_visitor<TValue> &visitor) override {
+    visitor.visit(this);
+  };
+  void accept_post_order(abstract_visitor<TValue> &visitor) override {
+    visitor.visit(this);
+  };
 
-  std::ostream &write(std::ostream &out) const final {
+  std::ostream &write(std::ostream &out) const override {
     out << data;
     return out;
   }
@@ -73,14 +68,21 @@ template <typename TValue> struct var_node : inode<TValue> {
 
   ~var_node() {}
 
-  TValue value() final { throw std::domain_error("No data source available"); }
+  TValue value() override {
+    throw std::domain_error("No data source available");
+  }
   TValue value(const data::i_data_source<TValue> &data) override {
     return data.get_value_for(selector);
   }
 
-  void accept(abstract_visitor<TValue> &visitor) final { visitor.visit(this); };
+  void accept_pre_order(abstract_visitor<TValue> &visitor) override {
+    visitor.visit(this);
+  };
+  void accept_post_order(abstract_visitor<TValue> &visitor) override {
+    visitor.visit(this);
+  };
 
-  std::ostream &write(std::ostream &out) const final {
+  std::ostream &write(std::ostream &out) const override {
     out << "\"" << selector << "\"";
     return out;
   }
@@ -97,7 +99,7 @@ private:
   const operation<TValue, TInputs...> &op;
 
   static const std::size_t N = sizeof...(TInputs);
-  constexpr size_t size() const final { return N; }
+  constexpr size_t size() const override { return N; }
 
   using node_ptr = std::unique_ptr<inode<TValue>>;
   using t_data = std::array<node_ptr, N>;
@@ -114,7 +116,7 @@ private:
   }
 
 public:
-  void push_argument(std::unique_ptr<inode<TValue>> arg) final {
+  void push_argument(std::unique_ptr<inode<TValue>> arg) override {
     for (size_t i = data.size() - 1; i >= 0; --i) {
       if (data[i] == nullptr) {
         data[i] = std::move(arg);
@@ -129,30 +131,33 @@ public:
 
   ~function_node() {}
 
-  TValue value() final {
+  TValue value() override {
     auto S = std::make_index_sequence<sizeof...(TInputs)>();
     return call(S);
   }
-  TValue value(const data::i_data_source<TValue> &source) final {
+  TValue value(const data::i_data_source<TValue> &source) override {
     auto S = std::make_index_sequence<sizeof...(TInputs)>();
     return call(S, source);
   }
 
-  void accept(abstract_visitor<TValue> &visitor) final {
+  void accept_pre_order(abstract_visitor<TValue> &visitor) override {
+    visitor.visit(this);
+    visitor.push_parent(this);
     for (node_ptr &node : data) {
-      node->accept(visitor);
+      node->accept_pre_order(visitor);
     }
+    visitor.pop_parent();
+  };
+  void accept_post_order(abstract_visitor<TValue> &visitor) override {
+    visitor.push_parent(this);
+    for (node_ptr &node : data) {
+      node->accept_post_order(visitor);
+    }
+    visitor.pop_parent();
     visitor.visit(this);
   };
 
-  void to_dot(std::ostream &dot, uint32_t inc = 0) override {
-    i_function_node<TValue>::to_dot(dot, inc);
-    std::apply(
-        [&dot, inc](const auto &... x) { (..., x->to_dot(dot, inc + 1)); },
-        data);
-  }
-
-  std::ostream &write(std::ostream &out) const final {
+  std::ostream &write(std::ostream &out) const override {
     out << op.name;
     return out;
   }
@@ -174,15 +179,12 @@ template <typename TValue> struct ast {
     return node->value(data);
   }
 
-  void visit(abstract_visitor<TValue> &visitor) { node->accept(visitor); };
-
-  std::string to_dot() {
-    std::stringstream dot;
-    dot << "ast" << std::endl;
-    node->to_dot(dot, 1);
-
-    return dot.str();
-  }
+  void visit_pre_order(abstract_visitor<TValue> &visitor) {
+    node->accept_pre_order(visitor);
+  };
+  void visit_post_order(abstract_visitor<TValue> &visitor) {
+    node->accept_post_order(visitor);
+  };
 };
 
 }; // namespace smaep

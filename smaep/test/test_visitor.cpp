@@ -5,9 +5,10 @@
 #include "catch2/catch.hpp"
 
 #include "smaep.h"
+#include "smaep/i_data_source.h"
 #include "smaep/visitors.hpp"
 
-TEST_CASE("print_tree", "postfix_visitor") {
+TEST_CASE("print expression", "postfix_printer") {
 
   auto expressions = std::list<std::tuple<std::string, std::string>>();
   expressions.push_back({"(1.5 + 1) * 2", "1.5 1 + 2 *"});
@@ -21,9 +22,40 @@ TEST_CASE("print_tree", "postfix_visitor") {
     auto ast = smaep::parse_double(problem);
 
     smaep::postfix_printer<double> p;
-    ast.visit(p);
+    ast.visit_post_order(p);
     auto result = p.str();
 
     CHECK(expected_upn == result);
   }
+}
+
+class test_source : public smaep::data::i_data_source<double> {
+  std::map<std::string, double> data{{"A", 1}, {"B", 2}};
+
+public:
+  double get_value_for(const std::string &key) const final {
+    return data.at(key);
+  }
+};
+
+TEST_CASE("print ast", "ast_printer") {
+
+  const std::string expected_ast = R"xx(ast
+  └ +
+    └ -1
+    └ abs
+      └ -
+        └ "A"
+        └ 3.14
+)xx";
+
+  test_source ds;
+  auto problem = "-1 + abs(data[A]-3.14)";
+  auto ast = smaep::parse_double(problem);
+
+  smaep::ast_printer<double> ap;
+  ast.visit_pre_order(ap);
+  auto result = ap.str();
+
+  CHECK(expected_ast == result);
 }
