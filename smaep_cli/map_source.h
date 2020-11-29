@@ -4,11 +4,11 @@
 #include <map>
 #include <string>
 
-#include "i_data_source.h"
+#include "data_source_interface.h"
 
 namespace smaep::data {
 template <typename TValue>
-class map_source : public i_data_source<TValue> {
+class map_source : public data_source_interface<TValue> {
   std::map<std::string, TValue> m_data;
 
  public:

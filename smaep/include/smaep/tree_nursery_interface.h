@@ -8,9 +8,9 @@
 
 namespace smaep {
 template <typename TValue>
-class i_tree_nursery {
+class tree_nursery_interface {
  public:
-  virtual void push_operand(std::unique_ptr<inode<TValue>> node) = 0;
+  virtual void push_operand(std::unique_ptr<node_interface<TValue>> node) = 0;
   virtual void push_operand(const TValue value) = 0;
   virtual void push_operand(const std::string& s) = 0;
 
@@ -21,6 +21,6 @@ class i_tree_nursery {
   virtual void open_parentheses() = 0;
   virtual void close_parentheses() = 0;
 
-  virtual std::unique_ptr<inode<TValue>> get_ast() = 0;
+  virtual std::unique_ptr<node_interface<TValue>> get_ast() = 0;
 };
 }  // namespace smaep

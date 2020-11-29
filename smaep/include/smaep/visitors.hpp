@@ -13,7 +13,7 @@ private:
   std::stringstream m_stream;
 
 public:
-  void visit(const smaep::inode<TValue> *node) override {
+  void visit(const smaep::node_interface<TValue> *node) override {
     m_stream << " " << *node;
   }
 
@@ -24,16 +24,16 @@ template <typename TValue>
 class ast_printer : public smaep::abstract_visitor<TValue> {
 private:
   std::stringstream m_stream;
-  std::stack<const smaep::inode<TValue> *> m_parents;
+  std::stack<const smaep::node_interface<TValue> *> m_parents;
 
 public:
   ast_printer() { m_stream << "ast" << std::endl; }
 
-  void visit(const smaep::inode<TValue> *node) override {
+  void visit(const smaep::node_interface<TValue> *node) override {
     auto inc = std::string(2 * m_parents.size() + 2, ' ');
     m_stream << inc << "└ " << *node << std::endl;
   }
-  void push_parent(const inode<TValue> *const node) override {
+  void push_parent(const node_interface<TValue> *const node) override {
     m_parents.push(node);
   };
   void pop_parent() override { m_parents.pop(); };

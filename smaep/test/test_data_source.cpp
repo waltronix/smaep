@@ -5,18 +5,8 @@
 
 #include "catch2/catch.hpp"
 
-#include "smaep/i_data_source.h"
+#include "smaep/data_source_samples.hpp"
 #include "smaep/parser.hpp"
-
-
-class test_source : public smaep::data::i_data_source<double> {
-  std::map<std::string, double> data{{"one", 1}, {"two", 2}};
-
-public:
-  double get_value_for(const std::string &key) const final {
-    return data.at(key);
-  }
-};
 
 TEST_CASE("data field", "[data source]") {
   auto expressions = std::list<std::pair<std::string, int64_t>>();
@@ -35,7 +25,7 @@ TEST_CASE("data field", "[data source]") {
 }
 
 TEST_CASE("with data source", "[data source]") {
-  test_source ds;
+  smaep::data::number_names<double> ds;
 
   auto expressions = std::list<std::tuple<std::string, double>>();
   expressions.push_back({"1 + data[one]", 2});

@@ -5,7 +5,7 @@
 #include "catch2/catch.hpp"
 
 #include "smaep.h"
-#include "smaep/i_data_source.h"
+#include "smaep/data_source_samples.hpp"
 #include "smaep/visitors.hpp"
 
 TEST_CASE("print expression", "postfix_printer") {
@@ -29,15 +29,6 @@ TEST_CASE("print expression", "postfix_printer") {
   }
 }
 
-class test_source : public smaep::data::i_data_source<double> {
-  std::map<std::string, double> data{{"A", 1}, {"B", 2}};
-
-public:
-  double get_value_for(const std::string &key) const final {
-    return data.at(key);
-  }
-};
-
 TEST_CASE("print ast", "ast_printer") {
 
   const std::string expected_ast = R"xx(ast
@@ -49,7 +40,6 @@ TEST_CASE("print ast", "ast_printer") {
         └ 3.14
 )xx";
 
-  test_source ds;
   auto problem = "-1 + abs(data[A]-3.14)";
   auto ast = smaep::parse_double(problem);
 

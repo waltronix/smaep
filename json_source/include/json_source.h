@@ -13,7 +13,7 @@
 #endif
 
 #include "smaep/exceptions.hpp"
-#include "smaep/i_data_source.h"
+#include "smaep/data_source_interface.h"
 
 namespace smaep::data {
 class json_source_base {
@@ -29,7 +29,7 @@ class json_source_base {
 };
 
 template <typename TValue>
-class json_source : public i_data_source<TValue>, private json_source_base {
+class json_source : public data_source_interface<TValue>, private json_source_base {
  public:
   using json_source_base::json_source_base;
 

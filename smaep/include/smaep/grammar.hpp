@@ -10,7 +10,7 @@
 #include <tao/pegtl.hpp>
 namespace pegtl = tao::TAO_PEGTL_NAMESPACE;
 
-#include "smaep/i_tree_nursery.h"
+#include "smaep/tree_nursery_interface.h"
 #include "smaep/operators.hpp"
 
 namespace smaep::grammar {
@@ -118,7 +118,7 @@ template <typename TNumber> struct action<number<TNumber>> {
   static void
   apply(const Input &in,
         const std::shared_ptr<smaep::parser_config<TNumber>> & /*unused*/,
-        i_tree_nursery<TNumber> &s) {
+        tree_nursery_interface<TNumber> &s) {
     std::stringstream ss(in.string());
     TNumber v;
     ss >> v;
@@ -131,7 +131,7 @@ template <> struct action<data_key> {
   static void
   apply(const Input &in,
         const std::shared_ptr<smaep::parser_config<TNumber>> & /*unused*/,
-        i_tree_nursery<TNumber> &s) {
+        tree_nursery_interface<TNumber> &s) {
     s.push_operand(in.string());
   }
 };
@@ -140,7 +140,7 @@ template <typename TNumber> struct action<infix<TNumber>> {
   template <typename Input>
   static void apply(const Input &in,
                     const std::shared_ptr<smaep::parser_config<TNumber>> &ops,
-                    i_tree_nursery<TNumber> &s) {
+                    tree_nursery_interface<TNumber> &s) {
     auto op_name = in.string();
     auto &op = ops->operators().at(op_name);
     s.push_operation(op);
@@ -151,7 +151,7 @@ template <> struct action<function_name> {
   template <typename Input, typename TNumber>
   static void apply(const Input &in,
                     const std::shared_ptr<smaep::parser_config<TNumber>> &ops,
-                    i_tree_nursery<TNumber> &s) {
+                    tree_nursery_interface<TNumber> &s) {
     auto op_name = in.string();
     auto &op = ops->functions().at(op_name);
     s.push_function(op);
@@ -161,7 +161,7 @@ template <> struct action<function_name> {
 template <> struct action<one<'('>> {
   template <typename TNumber>
   static void apply0(const std::shared_ptr<smaep::parser_config<TNumber>> &ops,
-                     i_tree_nursery<TNumber> &s) {
+                     tree_nursery_interface<TNumber> &s) {
     s.open_parentheses();
   }
 };
@@ -170,7 +170,7 @@ template <> struct action<one<')'>> {
   template <typename TNumber>
   static void
   apply0(const std::shared_ptr<smaep::parser_config<TNumber>> & /*unused*/,
-         i_tree_nursery<TNumber> &s) {
+         tree_nursery_interface<TNumber> &s) {
     s.close_parentheses();
   }
 };

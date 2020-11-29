@@ -3,7 +3,7 @@
 #include <memory>
 #include <stack>
 
-#include "smaep/i_tree_nursery.h"
+#include "smaep/tree_nursery_interface.h"
 
 #include "smaep/operators.hpp"
 #include "smaep/tree.hpp"
@@ -12,7 +12,7 @@ namespace smaep {
 /** Class that takes care of an operand and an operator stack for shift-reduce
  *  style handling of operator priority
  */
-template <typename TValue> class tree_nursery : public i_tree_nursery<TValue> {
+template <typename TValue> class tree_nursery : public tree_nursery_interface<TValue> {
 public:
   tree_nursery() {
     // we initialize the operator stack with an opening parenthesis, so we can
@@ -20,7 +20,7 @@ public:
     open_parentheses();
   }
 
-  void push_operand(std::unique_ptr<inode<TValue>> node) override {
+  void push_operand(std::unique_ptr<node_interface<TValue>> node) override {
     m_operands.push(std::move(node));
   }
 
@@ -51,26 +51,26 @@ public:
   }
 
   void close_parentheses() override {
-    std::unique_ptr<inode<TValue>> r = make_subtree();
+    std::unique_ptr<node_interface<TValue>> r = make_subtree();
     m_operands.push(std::move(r));
   }
 
-  std::unique_ptr<inode<TValue>> get_ast() override { return make_subtree(); }
+  std::unique_ptr<node_interface<TValue>> get_ast() override { return make_subtree(); }
 
 private:
-  std::stack<std::unique_ptr<inode<TValue>>> m_operands;
-  std::stack<std::pair<order, std::unique_ptr<i_function_node<TValue>>>>
+  std::stack<std::unique_ptr<node_interface<TValue>>> m_operands;
+  std::stack<std::pair<order, std::unique_ptr<function_node_interface<TValue>>>>
       m_operations;
 
   /** Applies stack operations until an 'opening' parentheses is found. */
-  std::unique_ptr<inode<TValue>> make_subtree() {
+  std::unique_ptr<node_interface<TValue>> make_subtree() {
     while (m_operations.top().first != order::parens) {
       apply_one_operation();
     }
     // now remove the opening parenthesis
     m_operations.pop();
 
-    std::unique_ptr<inode<TValue>> r;
+    std::unique_ptr<node_interface<TValue>> r;
     m_operands.top().swap(r);
     m_operands.pop();
 
@@ -81,7 +81,7 @@ private:
    * it to the operand stack.
    */
   void apply_one_operation() {
-    std::unique_ptr<i_function_node<TValue>> operation =
+    std::unique_ptr<function_node_interface<TValue>> operation =
         std::move(m_operations.top().second);
     m_operations.top().second.release();
     m_operations.pop();

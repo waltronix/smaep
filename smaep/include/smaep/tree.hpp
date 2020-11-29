@@ -1,24 +1,21 @@
 ﻿#pragma once
 
 #include <functional>
-#include <iomanip>
-#include <iterator>
 #include <memory>
 #include <ostream>
 #include <string>
-#include <tuple>
 
-#include "smaep/i_data_source.h"
+#include "smaep/data_source_interface.h"
 #include "smaep/operators.hpp"
 
 namespace smaep {
 
 template <typename TValue> class abstract_visitor;
 
-template <typename TValue> struct inode {
-  virtual ~inode(){};
+template <typename TValue> struct node_interface {
+  virtual ~node_interface(){};
   virtual TValue value() = 0;
-  virtual TValue value(const data::i_data_source<TValue> &data) = 0;
+  virtual TValue value(const data::data_source_interface<TValue> &data) = 0;
 
   virtual void accept_pre_order(abstract_visitor<TValue> &visitor) = 0;
   virtual void accept_post_order(abstract_visitor<TValue> &visitor) = 0;
@@ -27,26 +24,26 @@ template <typename TValue> struct inode {
 };
 
 template <typename TValue>
-std::ostream &operator<<(std::ostream &out, const inode<TValue> &node) {
+std::ostream &operator<<(std::ostream &out, const node_interface<TValue> &node) {
   return node.write(out);
 }
 
 template <typename TValue> class abstract_visitor {
 public:
   ~abstract_visitor() = default;
-  virtual void visit(const inode<TValue> *const node) = 0;
-  virtual void push_parent(const inode<TValue> *const node){};
+  virtual void visit(const node_interface<TValue> *const node) = 0;
+  virtual void push_parent(const node_interface<TValue> *const node){};
   virtual void pop_parent(){};
 };
 
-template <typename TValue> struct const_node : inode<TValue> {
+template <typename TValue> struct const_node : node_interface<TValue> {
   TValue data;
 
   const_node(TValue value) : data(value) {}
   ~const_node() {}
 
   TValue value() override { return data; }
-  TValue value(const data::i_data_source<TValue> &) override { return data; }
+  TValue value(const data::data_source_interface<TValue> &) override { return data; }
 
   void accept_pre_order(abstract_visitor<TValue> &visitor) override {
     visitor.visit(this);
@@ -61,7 +58,7 @@ template <typename TValue> struct const_node : inode<TValue> {
   }
 };
 
-template <typename TValue> struct var_node : inode<TValue> {
+template <typename TValue> struct var_node : node_interface<TValue> {
   std::string selector;
 
   var_node(const std::string &value) : selector(value) {}
@@ -71,7 +68,7 @@ template <typename TValue> struct var_node : inode<TValue> {
   TValue value() override {
     throw std::domain_error("No data source available");
   }
-  TValue value(const data::i_data_source<TValue> &data) override {
+  TValue value(const data::data_source_interface<TValue> &data) override {
     return data.get_value_for(selector);
   }
 
@@ -88,20 +85,20 @@ template <typename TValue> struct var_node : inode<TValue> {
   }
 };
 
-template <typename TValue> struct i_function_node : inode<TValue> {
+template <typename TValue> struct function_node_interface : node_interface<TValue> {
   virtual size_t size() const = 0;
-  virtual void push_argument(std::unique_ptr<inode<TValue>> arg) = 0;
+  virtual void push_argument(std::unique_ptr<node_interface<TValue>> arg) = 0;
 };
 
 template <typename TValue, typename... TInputs>
-struct function_node : i_function_node<TValue> {
+struct function_node : function_node_interface<TValue> {
 private:
   const operation<TValue, TInputs...> &op;
 
   static const std::size_t N = sizeof...(TInputs);
   constexpr size_t size() const override { return N; }
 
-  using node_ptr = std::unique_ptr<inode<TValue>>;
+  using node_ptr = std::unique_ptr<node_interface<TValue>>;
   using t_data = std::array<node_ptr, N>;
   t_data data = {};
 
@@ -111,12 +108,12 @@ private:
 
   template <size_t... S>
   TValue call(std::index_sequence<S...>,
-              const data::i_data_source<TValue> &source) {
+              const data::data_source_interface<TValue> &source) {
     return op.function(std::get<S>(data)->value(source)...);
   }
 
 public:
-  void push_argument(std::unique_ptr<inode<TValue>> arg) override {
+  void push_argument(std::unique_ptr<node_interface<TValue>> arg) override {
     for (size_t i = data.size() - 1; i >= 0; --i) {
       if (data[i] == nullptr) {
         data[i] = std::move(arg);
@@ -135,7 +132,7 @@ public:
     auto S = std::make_index_sequence<sizeof...(TInputs)>();
     return call(S);
   }
-  TValue value(const data::i_data_source<TValue> &source) override {
+  TValue value(const data::data_source_interface<TValue> &source) override {
     auto S = std::make_index_sequence<sizeof...(TInputs)>();
     return call(S, source);
   }
@@ -171,11 +168,11 @@ make_node(const operation<TOut, TIn...> &op) {
 
 template <typename TValue> struct ast {
   const std::shared_ptr<parser_config<TValue>> operations;
-  const std::unique_ptr<inode<TValue>> node;
+  const std::unique_ptr<node_interface<TValue>> node;
 
   TValue value() { return node->value(); }
 
-  TValue value(const data::i_data_source<TValue> &data) {
+  TValue value(const data::data_source_interface<TValue> &data) {
     return node->value(data);
   }
 
