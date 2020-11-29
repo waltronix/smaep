@@ -68,7 +68,7 @@ TEST_CASE("dot printer", "[data source]") {
   const std::string expected_ast = R"xx(ast
    └ +
      └ -1
-     └ abs()
+     └ abs
        └ -
          └ "two"
          └ 3.14

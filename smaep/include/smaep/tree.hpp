@@ -45,6 +45,8 @@ template <typename TValue> class abstract_visitor {
 public:
   ~abstract_visitor() = default;
   virtual void visit(const inode<TValue> *const node) = 0;
+  // virtual void visit(const inode<TValue> *const node, const inode<TValue>
+  // *const parent) = 0;
 };
 
 template <typename TValue> struct const_node : inode<TValue> {
@@ -101,18 +103,6 @@ private:
   using t_data = std::array<node_ptr, N>;
   t_data data = {};
 
-  template <size_t I = sizeof...(TInputs) - 1, typename TInput>
-  void static push_arg(t_data &data, std::unique_ptr<inode<TInput>> arg) {
-
-    for (size_t i = data.size() - 1; i >= 0; --i) {
-      if (data[i] == nullptr) {
-        data[i] = std::move(arg);
-        return;
-      }
-    }
-    throw std::logic_error("function arguments already satisfied");
-  }
-
   template <size_t... S> TValue call(std::index_sequence<S...>) {
     return op.function(std::get<S>(data)->value()...);
   }
@@ -125,7 +115,13 @@ private:
 
 public:
   void push_argument(std::unique_ptr<inode<TValue>> arg) final {
-    push_arg(data, std::move(arg));
+    for (size_t i = data.size() - 1; i >= 0; --i) {
+      if (data[i] == nullptr) {
+        data[i] = std::move(arg);
+        return;
+      }
+    }
+    throw std::logic_error("function arguments already satisfied");
   }
 
   function_node(const operation<TValue, TInputs...> &operation)
@@ -157,8 +153,7 @@ public:
   }
 
   std::ostream &write(std::ostream &out) const final {
-    std::string postfix = (size() == 1) ? "()" : "";
-    out << op.name << postfix;
+    out << op.name;
     return out;
   }
 };
@@ -178,6 +173,8 @@ template <typename TValue> struct ast {
   TValue value(const data::i_data_source<TValue> &data) {
     return node->value(data);
   }
+
+  void visit(abstract_visitor<TValue> &visitor) { node->accept(visitor); };
 
   std::string to_dot() {
     std::stringstream dot;
