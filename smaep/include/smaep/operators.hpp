@@ -34,7 +34,7 @@ private:
   static std::shared_ptr<parser_config<TValue>> create_default() {
     auto config = std::make_shared<parser_config<TValue>>();
 
-    config->add_operator("^", order(4), [](const TValue l, const TValue r) {
+    config->add_operator("^", order(4), [](const TValue l, const TValue r) -> TValue {
       return pow(l, r);
     });
     config->add_operator("*", order(5),
